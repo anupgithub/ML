@@ -1,5 +1,14 @@
 # Attention Mechanism - Toy Example (Fox Sentence)
 
+## Document Flow
+This document walks through a simplified and intuitive explanation of how attention works in Transformer models, using the sentence:
+
+> "The quick brown fox jumps"
+
+We start by understanding the idea of attention and how it results in a weighted combination of previous words. Then we explore how that weighted sum (context vector) leads to a prediction of the next word.
+
+Later in the document, we explain how the model actually **calculates those attention weights** using Q (Query), K (Key), and V (Value) projections. Finally, we walk through what happens during forward and backward passes in training, and how the model gradually learns to improve attention and word prediction.
+
 This markdown summarizes the end-to-end intuition and mechanics behind attention using the toy sentence:
 
 > "The quick brown fox jumps"
