@@ -8,7 +8,7 @@ This markdown summarizes the end-to-end intuition and mechanics behind attention
 
 ## What is Attention?
 
-**Attention gives a weight to each word in a sequence when deciding what matters for the current word being processed.**
+**Attention gives a weight to each word in a sequence when deciding what matters for the current word being processed. ( Don't worry about how its calculated at this point) **
 
 In Transformer terms:
 - If you're at word *t*, and you're using self-attention, then:
