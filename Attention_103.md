@@ -150,62 +150,8 @@ Wout = [
   [0.5, 0.2],  # "apple"
   [0.1, 0.6],  # "run"
   [0.7, 0.4],  # "fox"
-  [0.2, 0.9]   # "jumps"
-]
-```
-```python
-logits = [0.66, 0.525] @ Wout.T
-```
-Compute dot products:
-```python
-"apple" = 0.5*0.66 + 0.2*0.525 = 0.33 + 0.105 = 0.435
-"run"   = 0.1*0.66 + 0.6*0.525 = 0.066 + 0.315 = 0.381
-"fox"   = 0.7*0.66 + 0.4*0.525 = 0.462 + 0.21  = 0.672
-"jumps" = 0.2*0.66 + 0.9*0.525 = 0.132 + 0.472 = 0.604
-```
-
-### Step 5: Softmax → Prediction
-```python
-softmax([0.435, 0.381, 0.672, 0.604]) ≈ [0.23, 0.22, 0.29, 0.26]
-```
-Predicted word = **"fox"** (highest score)
-
-### Step 6: Backpropagation
-- Ground truth = "jumps"
-- Model predicted = "fox"
-- Loss is calculated
-- Backprop updates:
-  - Attention weights
-  - Embeddings
-  - Wq/Wk/Wv
-  - Wout
-
-Over time, this pushes the model to make the context vector point more toward the "jumps" region.
-
---------|------------------|------------------------|
-| The    | [0.1, 0.2]       | 0.2                    |
-| quick  | [0.4, 0.1]       | 0.3                    |
-| brown  | [0.3, 0.5]       | 0.5                    |
-
-### Step 3: Compute Weighted Sum (Context Vector)
-```python
-context = 0.2 * [0.1, 0.2] + 
-          0.3 * [0.4, 0.1] + 
-          0.5 * [0.3, 0.5]
-```
-```python
-= [0.02, 0.04] + [0.12, 0.03] + [0.15, 0.25]
-= [0.29, 0.32]
-```
-
-### Step 4: Output Projection
-We pass this context vector through a vocab projection matrix (Wout) to get logits:
-```python
-Wout = [
-  [0.5, 0.2],  # "apple"
-  [0.1, 0.6],  # "run"
-  [0.7, 0.4],  # "fox"
-  [0.2, 0.9],  # "pizza"
+  [0.2, 0.9],  # "jumps"
+  [0.3, 0.8]   # "eats"
 ]
 ```
 ```python
@@ -216,18 +162,34 @@ Compute dot products:
 "apple" = 0.5*0.29 + 0.2*0.32 = 0.145 + 0.064 = 0.209
 "run"   = 0.1*0.29 + 0.6*0.32 = 0.029 + 0.192 = 0.221
 "fox"   = 0.7*0.29 + 0.4*0.32 = 0.203 + 0.128 = 0.331
-"pizza" = 0.2*0.29 + 0.9*0.32 = 0.058 + 0.288 = 0.346
+"jumps" = 0.2*0.29 + 0.9*0.32 = 0.058 + 0.288 = 0.346
+"eats"  = 0.3*0.29 + 0.8*0.32 = 0.087 + 0.256 = 0.343
 ```
 
 ### Step 5: Softmax → Prediction
 ```python
-softmax([0.209, 0.221, 0.331, 0.346]) ≈ [0.23, 0.23, 0.26, 0.28]
+softmax([0.209, 0.221, 0.331, 0.346, 0.343]) ≈ [0.16, 0.17, 0.21, 0.24, 0.22]
 ```
-Predicted word = **"pizza"** (highest score)
+
+**What does softmax do?**
+Softmax takes a list of numbers (logits) and turns them into probabilities that sum to 1. It does this by:
+1. Exponentiating each number: `exp(xi)`
+2. Dividing by the sum of all exponentiated values
+
+Example:
+```python
+softmax([2.0, 1.0, 0.1])
+= [exp(2.0), exp(1.0), exp(0.1)] / sum([exp(2.0), exp(1.0), exp(0.1)])
+≈ [7.39, 2.71, 1.10] / 11.2
+≈ [0.66, 0.24, 0.10]
+```
+
+This means the highest logit (2.0) gets the highest probability (0.66), and smaller values get proportionally lower probabilities.
+Predicted word = **"jumps"** (highest score — just above "eats")
 
 ### Step 6: Backpropagation
-- Ground truth = "fox"
-- Model predicted = "pizza"
+- Ground truth = "jumps"
+- Model predicted = "eats"
 - Loss is calculated
 - Backprop updates:
   - Attention weights
@@ -235,45 +197,40 @@ Predicted word = **"pizza"** (highest score)
   - Wq/Wk/Wv
   - Wout
 
-Over time, this pushes the model to make the context vector point more toward the "fox" region.
+Over time, this pushes the model to make the context vector point more toward the "jumps" region.
 
 ---
-The context vector is passed through a **vocab projection layer**:
+### Step 4: Output Projection (Revised and Simplified)
+We pass the context vector `[0.66, 0.525]` through a vocab projection matrix (Wout) to get logits:
+
 ```python
-logits = context @ Wout
-```
-Then softmax is applied, and the model selects the word with the highest probability.
-
-Let’s assume this:
-- You have a context vector: `[0.66, 0.525]`
-- You have a vocabulary of 4 words: `"apple", "run", "fox", "pizza"`
-- The output projection matrix (Wout) is:
-
-```
-W = [
-  [0.5, 0.2],   --> "apple"
-  [0.1, 0.6],   --> "run"
-  [0.7, 0.4],   --> "fox"
-  [0.2, 0.9]    --> "pizza"
+Wout = [
+  [0.5, 0.2],  # "apple"
+  [0.1, 0.6],  # "run"
+  [0.7, 0.4],  # "fox"
+  [0.2, 0.9],  # "jumps"
+  [0.3, 0.8]   # "eats"
 ]
 ```
 
-Now compute dot product of context vector with each row:
-```
+Compute dot products:
+```python
 "apple" = 0.5*0.66 + 0.2*0.525 = 0.33 + 0.105 = 0.435
 "run"   = 0.1*0.66 + 0.6*0.525 = 0.066 + 0.315 = 0.381
 "fox"   = 0.7*0.66 + 0.4*0.525 = 0.462 + 0.21  = 0.672
-"pizza" = 0.2*0.66 + 0.9*0.525 = 0.132 + 0.472 = 0.604
+"jumps" = 0.2*0.66 + 0.9*0.525 = 0.132 + 0.472 = 0.604
+"eats"  = 0.3*0.66 + 0.8*0.525 = 0.198 + 0.42  = 0.618
 ```
 
 Then apply softmax:
-```
-softmax([0.435, 0.381, 0.672, 0.604]) ≈ [0.23, 0.22, 0.29, 0.26]
+```python
+softmax([0.435, 0.381, 0.672, 0.604, 0.618]) ≈ [0.17, 0.16, 0.24, 0.21, 0.22]
 ```
 
-So the model predicts **“fox”** with the highest probability (0.29), assuming argmax.
+### Step 5: Prediction
+Initially, the model might predict **"eats"**, because its score is slightly higher than "jumps".
 
-Initially, the model might predict **"eats"**, but after backpropagation, it adjusts to predict **"jumps"**.
+After training (i.e., after backpropagation), the weights will adjust so that the score for **"jumps"** becomes higher — making the correct prediction.
 The context vector is passed through a **vocab projection layer**:
 ```python
 logits = context @ Wout
