@@ -51,7 +51,7 @@ For the sentence: "The quick brown fox jumps" — we want to predict the next wo
 
 Assume we’re computing attention from the perspective of **“jumps”**, and attending to all previous words.
 
-| Word   | Embedding (2D)<br><sub><i>(Think of this as a list of features or properties of the word — e.g., noun-ness, verb-ness, animateness, etc.)</i></sub> | Attention Weight (α) |
+| Word   | Embedding (2D)<br><sub><i>(Think of this as a list of features or properties of the word — e.g., noun-ness, verb-ness, animateness, etc.)</i></sub> | Attention weights assigned by 'jumps' to each of these previous words. |
 |--------|------------------|------------------------|
 | The    | [0.1, 0.2]       | 0.10                   |
 | quick  | [0.4, 0.1]       | 0.05                   |
