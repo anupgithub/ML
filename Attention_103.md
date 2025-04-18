@@ -23,7 +23,10 @@ In Transformer terms:
 - If you're at word *t*, and you're using self-attention, then:
   - You look at all previous and current words (in unidirectional models like GPT), or **all words in the sentence** (in bidirectional models like BERT).
   - The attention mechanism computes **weights (a.k.a. attention scores)** for each of those words.
-  - These weights are used to compute a **weighted sum** of the corresponding **V vectors** (typically derived from word embeddings).
+- These weights are used to compute a **weighted sum of all the word embeddings** — this gives the model a focused context that captures what’s relevant for the current word.
+  - In this toy example, V vectors are directly the **word embeddings**, so the weighted sum effectively becomes a **weighted sum of all the word embeddings**.
+ (typically derived from word embeddings).
+  - **This weighted sum becomes the 'context vector' for word *t*** — it's the distilled context that the model uses to process or generate word *t*.
 
 ### Visualizing It:
 For the sentence:
