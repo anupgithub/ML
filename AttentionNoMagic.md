@@ -96,3 +96,51 @@ So you can think of Q and K as:
 Their alignment becomes the attention score.
 
 And that’s it — no magic. Just math and training loops.
+
+---
+
+## 📦 What is V?
+
+Just like we got Q and K by projecting the embedding with `Wq` and `Wk`, we also get V by applying another projection:
+
+```python
+V = Wv @ embedding
+```
+
+- `Wv` is a learnable matrix (just like `Wq` and `Wk`)
+- V is a transformed version of the word's embedding, meant to be passed forward into the final output (context vector)
+
+But again:
+> V has no inherent “value-ness.”
+> It only has meaning because of how it is used.
+
+---
+
+## 💡 How is V Used?
+
+After we compute attention scores for a word (like "jumps"), we use softmax to get weights:
+
+```python
+α_The   = softmax(score(Q_jumps, K_The))
+α_quick = softmax(score(Q_jumps, K_quick))
+α_brown = softmax(score(Q_jumps, K_brown))
+α_fox   = softmax(score(Q_jumps, K_fox))
+```
+
+Then we compute the context vector for "jumps" as:
+
+```python
+context_jumps = α_The * V_The +
+                α_quick * V_quick +
+                α_brown * V_brown +
+                α_fox * V_fox
+```
+
+We are taking a **weighted average** of V vectors — weighted by how much attention "jumps" paid to each word.
+
+So if "jumps" paid 75% of its attention to "fox", then most of the context will be made up of `V_fox`.
+
+The **V vector acts as the information content**, and the attention score says:
+> “How much of this information should I bring in?”
+
+It becomes meaningful because it contributes to the final output and is shaped through training.
