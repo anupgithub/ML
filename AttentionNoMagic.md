@@ -85,6 +85,74 @@ So if `Q_jumps` pointed too much at `K_quick` instead of `K_fox`, gradients flow
 
 ## 🧠 The Bigger Picture
 
+---
+
+## 🏁 Final Step: From Context Vector to Word Prediction
+
+Once the context vector is computed (as a weighted sum of V vectors), the model uses it to **predict the next word** in the sequence.
+
+This is done by comparing the context vector to all word vectors in the vocabulary using a **vocab projection matrix**:
+
+```python
+logits = context_vector @ W_vocab.T
+```
+
+Where:
+- `W_vocab` is a learnable matrix where each row corresponds to a word in the vocabulary
+- The dot product measures how closely the context vector aligns with each vocab word
+
+Then, the logits are passed through softmax:
+
+```python
+probs = softmax(logits)
+```
+
+And the word with the highest probability is selected as the prediction:
+
+```python
+predicted_word = argmax(probs)
+```
+
+So the entire process — from Q/K alignment, to V blending, to prediction — is just a structured series of vector operations and gradient-driven updates.
+
+No magic. Just math, projections, and optimization.
+
+---
+
+## 🔄 Rethinking Q/K/V – Relational vs Intrinsic Properties
+
+We can interpret the attention mechanism as separating two distinct functions:
+
+### ✅ Q and K → **Relational Properties**
+These are context-aware projections used to measure **how words relate to each other**.
+
+- `Q_jumps` = How "jumps" is looking to connect with others
+- `K_fox`   = How "fox" presents itself to be attended to
+
+The dot product `Q · K` measures how much alignment exists — it is the basis of attention weight.
+
+### ✅ V → **Intrinsic Properties**
+This is a projection of the original embedding that carries the **informational content** of a word.
+
+- V does not participate in scoring — it contributes to the **final output**
+- You can think of it as: “What this word offers to the overall meaning if it gets attended to.”
+
+### 🔁 Process Summary:
+1. Start with base embeddings for each word
+2. Project them into:
+   - Q: seeking relation (per current word)
+   - K: offering identity (per all words)
+   - V: offering content (per all words)
+3. Use dot(Q, K) to get scores
+4. Apply softmax to get weights
+5. Use those weights to combine V vectors — a **context-aware blend** of the word content
+
+This helps us separate:
+- **Scoring functions** → via Q and K
+- **Content representation** → via V
+
+All learned via backprop — no manual semantics, just structure guided by loss.
+
 This setup doesn't work because we told the model what Q and K mean. It works because:
 - Q and K are **used in different parts of the attention computation**
 - Gradients flow differently through each
@@ -96,51 +164,3 @@ So you can think of Q and K as:
 Their alignment becomes the attention score.
 
 And that’s it — no magic. Just math and training loops.
-
----
-
-## 📦 What is V?
-
-Just like we got Q and K by projecting the embedding with `Wq` and `Wk`, we also get V by applying another projection:
-
-```python
-V = Wv @ embedding
-```
-
-- `Wv` is a learnable matrix (just like `Wq` and `Wk`)
-- V is a transformed version of the word's embedding, meant to be passed forward into the final output (context vector)
-
-But again:
-> V has no inherent “value-ness.”
-> It only has meaning because of how it is used.
-
----
-
-## 💡 How is V Used?
-
-After we compute attention scores for a word (like "jumps"), we use softmax to get weights:
-
-```python
-α_The   = softmax(score(Q_jumps, K_The))
-α_quick = softmax(score(Q_jumps, K_quick))
-α_brown = softmax(score(Q_jumps, K_brown))
-α_fox   = softmax(score(Q_jumps, K_fox))
-```
-
-Then we compute the context vector for "jumps" as:
-
-```python
-context_jumps = α_The * V_The +
-                α_quick * V_quick +
-                α_brown * V_brown +
-                α_fox * V_fox
-```
-
-We are taking a **weighted average** of V vectors — weighted by how much attention "jumps" paid to each word.
-
-So if "jumps" paid 75% of its attention to "fox", then most of the context will be made up of `V_fox`.
-
-The **V vector acts as the information content**, and the attention score says:
-> “How much of this information should I bring in?”
-
-It becomes meaningful because it contributes to the final output and is shaped through training.
