@@ -51,13 +51,12 @@ For the sentence: "The quick brown fox jumps" — we want to predict the next wo
 
 Assume we’re computing attention from the perspective of **“jumps”**, and attending to all previous words.
 
-| Word   | Embedding (2D)  | Attention Weight (α) |
+| Word   | Embedding (2D)<br><sub><i>(Think of this as a list of features or properties of the word — e.g., noun-ness, verb-ness, animateness, etc.)</i></sub> | Attention Weight (α) |
 |--------|------------------|------------------------|
 | The    | [0.1, 0.2]       | 0.10                   |
 | quick  | [0.4, 0.1]       | 0.05                   |
 | brown  | [0.3, 0.5]       | 0.10                   |
 | fox    | [0.8, 0.6]       | 0.75                   |
-
 
 ## 2. **Weighted Sum (Context Vector)**
 We compute the context vector for “jumps” by multiplying each embedding by its attention weight:
