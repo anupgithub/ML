@@ -30,7 +30,7 @@ Because **“fox” is most relevant** to understanding or predicting “jumps�
 
 **Attention gives a weight to each word in a sequence when deciding what matters for the current word being processed.**
 
-When the model is generating or analyzing a word (e.g., "jumps"), it uses attention to decide how much to focus on each previous word (like “fox”, “brown”, etc.). These weights are computed based on similarity between Q and K vectors, and the final result is a weighted combination of the V vectors.
+When the model is generating or analyzing a word (e.g., "jumps"), it uses attention to decide how much to focus on each previous word (like “fox”, “brown”, etc.). 
 
 ---
 
