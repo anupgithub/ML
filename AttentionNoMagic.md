@@ -28,6 +28,31 @@ These projections create two new vector spaces:
 
 ## ⚙️ The Actual Score Calculation
 
+### The Math (Concrete Example)
+You have a vector `Q_jumps` (produced by `Wq @ embedding_jumps`)
+
+You have a set of vectors `[K_The, K_quick, K_brown, K_fox]` (each from `Wk @ embedding_word`)
+
+You compute:
+
+```python
+scores = [Q_jumps · K_The,
+          Q_jumps · K_quick,
+          Q_jumps · K_brown,
+          Q_jumps · K_fox]
+```
+
+These scores have no built-in semantics — they just reflect how aligned these learned vector projections are.
+
+✅ The truth:  
+While we call them “query” and “key,” they’re just two separate projections of the input embeddings.
+
+There is:
+- No “real query”
+- No “real key”
+- Just a learned direction and comparison function
+
+
 To determine how much one word should "attend to" another, we compute the **dot product** of the two projected vectors:
 
 ```python
